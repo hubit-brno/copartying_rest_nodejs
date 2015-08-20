@@ -1,0 +1,11 @@
+{
+  "name": "copartying_rest_nodejs",
+  "version": "1.0.0",
+  "description": "REST API for Copartying",
+  "main": "server.js",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.13.3",
+    "arangojs": "^3.9.1"
+  }
+}
