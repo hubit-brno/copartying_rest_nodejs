@@ -50,14 +50,13 @@ router.post('/coparties', function(req, res, next) {
 wss.on("connection", function(ws) {
 
   r.table('coparties').changes().run(app._rdbConn, function(err, cursor){
-    cursor.each(function(){      
+    cursor.each(function(){
       ws.send("NEW PARTY!", function() {  })
     })
   })
 
   ws.on("close", function() {
-    console.log("websocket connection close")
-    clearInterval(id)
+    console.log("websocket connection close");    
   })
 })
 
