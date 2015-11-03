@@ -1,0 +1,37 @@
+/*
+  POST /coparties
+  objekt pro vytvoření coparty
+ */
+{
+  "coparty": {
+    "id": "1",
+    "name": "První coparty na světě",
+    "description": "Toto je opravdu první, jedinečná a úžasná coparty!",
+    "date": "2015-11-04T18:00:00Z",
+    "place": "Impacthub Brno, Cyrilská 7",
+    "expected_number": 13,
+    "items": [
+      {
+        "id": "1",
+        "name": "Pivo Bernard",
+        "description": "Výborný ležák z Humpolce",
+        "volume": "0,5l (láhev)",
+        "count": 12
+      },
+      {
+        "id": "2",
+        "name": "Klobásy",
+        "description": "něco domácího, žádný od Babiše",
+        "volume": "2 do páru",
+        "count": 10
+      },
+      {
+        "id": "3",
+        "name": "Rohlíky",
+        "description": "křupavé (čti včerejší) od prezidentů",
+        "volume": "5",
+        "count": 3
+      }
+    ]
+  }
+}
