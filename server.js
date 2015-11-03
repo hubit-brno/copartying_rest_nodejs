@@ -1,24 +1,65 @@
+var config = require(__dirname+"/config.js");
+var initDb = require(__dirname+"/initDb.js");
+
+var bodyParser = require('body-parser');
+var async = require('async');
+var r = require('rethinkdb');
+
+
 var express = require('express');
-var Database = require('arangojs');
 var app = express();
 
-var port = process.env.PORT || 8080;
 var router = express.Router();
-var db = new Database('http://hub1:IFeelGood1@46.28.108.92:8529');
 
 
+router.get('/coparties', function(req, res, next) {
+  r.table('coparties').orderBy({index: 'createdAt'}).run(req.app._rdbConn, function(err, cursor) {
+    if(err) {
+      return next(err);
+    }
 
-// http://expressjs.com/4x/api.html#router
-router.get('/', function(req, res) {
-    res.json({
-        message: "Let's have a geek party!"
+    //Retrieve all the todos in an array.
+    cursor.toArray(function(err, result) {
+      if(err) {
+        return next(err);
+      }
+
+      res.json(result);
     });
+  });
 });
 
+router.post('/coparties', function(req, res, next) {
 
+  var coparty = req.body.coparty;
+  coparty.createdAt = r.now();
 
-app.use('/api/v1', router);
-app.listen(port);
+  r.table('coparties').insert(coparty, {returnChanges: true}).run(req.app._rdbConn, function(err, result) {
+    if(err) {
+      return next(err);
+    }
 
-console.log('Party at port ' + port);
-console.log(db);
+    res.json(result.changes[0].new_val);
+  });
+});
+
+function startExpress(connection) {
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({
+    extended: true
+  }));
+  app.use('/api/v1', router);
+  app._rdbConn = connection;
+  app.listen(config.express.port);
+  console.log('Listening on port ' + config.express.port);
+}
+
+function connectDb(callback) {
+  r.connect(config.rethinkdb, function(err, conn) {
+      if (err) throw err;
+      startExpress(conn);
+  })
+}
+
+connectDb();
+//initDb.initDb();
