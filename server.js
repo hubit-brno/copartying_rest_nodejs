@@ -5,12 +5,14 @@ var bodyParser = require('body-parser');
 var async = require('async');
 var r = require('rethinkdb');
 
-
+var http = require("http");
 var express = require('express');
 var app = express();
-
 var router = express.Router();
 
+var WebSocketServer = require("ws").Server
+var server = http.createServer(app);
+var wss = new WebSocketServer({server: server})
 
 router.get('/coparties', function(req, res, next) {
   r.table('coparties').orderBy({index: 'createdAt'}).run(req.app._rdbConn, function(err, cursor) {
@@ -39,9 +41,25 @@ router.post('/coparties', function(req, res, next) {
       return next(err);
     }
 
-    res.json(result.changes[0].new_val);
+    res.json(result.changes[0] ? result.changes[0].new_val : {});
   });
 });
+
+
+
+wss.on("connection", function(ws) {
+
+  r.table('coparties').changes().run(app._rdbConn, function(err, cursor){
+    cursor.each(function(){      
+      ws.send("NEW PARTY!", function() {  })
+    })
+  })
+
+  ws.on("close", function() {
+    console.log("websocket connection close")
+    clearInterval(id)
+  })
+})
 
 function startExpress(connection) {
   app.use(bodyParser.json());
@@ -50,7 +68,7 @@ function startExpress(connection) {
   }));
   app.use('/api/v1', router);
   app._rdbConn = connection;
-  app.listen(config.express.port);
+  server.listen(config.express.port);
   console.log('Listening on port ' + config.express.port);
 }
 

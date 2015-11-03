@@ -4,12 +4,12 @@
   "description": "REST API for Copartying",
   "main": "server.js",
   "license": "ISC",
-  "dependencies": {
-    "arangojs": "^3.9.1",
+  "dependencies": {    
     "async": "^1.5.0",
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
     "rethinkdb": "^2.1.1",
-    "thinky": "^2.1.11"
+    "thinky": "^2.1.11",
+    "ws": "^0.8.0"
   }
 }

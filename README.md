@@ -20,3 +20,7 @@
 
 ## RethinkDB
 Připravená instalace rethinkdb na serveru `46.28.108.92`. Dostupné i webové rozhraní `http://46.28.108.92:8080`. Příprava pro použití [thinky.io](https://thinky.io/) - ORM pro RethinkDB. V souboru coparty.js připraven model pro coparty.
+
+## WebScoket
+Využití websocketů pro notifikaci že se změnila tabulka coaprties - nová coparty, upravené, smazaná ...
+Zatím primitivní funkcionalita = je možné se připojit na ws://localhost:8080/ při každé změně dat pak přijde zpráva NEW PARTY!.
