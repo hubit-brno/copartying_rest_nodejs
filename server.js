@@ -10,9 +10,7 @@ var express = require('express');
 var app = express();
 var router = express.Router();
 
-var WebSocketServer = require("ws").Server
-var server = http.createServer(app);
-var wss = new WebSocketServer({server: server})
+var expressWs = require('express-ws')(app);
 
 router.get('/coparties', function(req, res, next) {
   r.table('coparties').orderBy({index: 'createdAt'}).run(req.app._rdbConn, function(err, cursor) {
@@ -45,20 +43,65 @@ router.post('/coparties', function(req, res, next) {
   });
 });
 
+router.put('/coparties/:copartyId', function(req, res, next) {
 
+  r.table('coparties').get(req.params.copartyId).update(req.body.coparty).run(req.app._rdbConn, function(err, result) {
+    if(err) {
+      return next(err);
+    }
 
-wss.on("connection", function(ws) {
+    res.json(result);
 
+  });
+});
+
+router.get('/coparties/:copartyId', function(req, res, next) {
+  r.table('coparties').get(req.params.copartyId).run(req.app._rdbConn, function(err, result) {
+    if(err) {
+      return next(err);
+    }
+
+    res.json(result);
+
+  });
+});
+
+app.ws('/coparties', function(ws, req) {
+
+  console.log('connect to coparties ws', req.query);
+  var copartiesWss = expressWs.getWss('/coparties');
   r.table('coparties').changes().run(app._rdbConn, function(err, cursor){
     cursor.each(function(){
-      ws.send("NEW PARTY!", function() {  })
+      copartiesWss.clients.forEach(function (client) {
+        client.send('COPARTIES UPDATE');
+      });
     })
   })
 
-  ws.on("close", function() {
-    console.log("websocket connection close");    
+});
+
+var wsClients = {};
+app.ws('/coparty', function(ws, req) {
+
+  console.log('connect to coparty ws', req.query);
+
+  wsClients[req.query.copartyId] = wsClients[req.query.copartyId] || [];
+  wsClients[req.query.copartyId].push(ws);
+  console.log("wsClients: ", wsClients);
+  r.table('coparties').get(req.query.copartyId).changes().run(app._rdbConn, function(err, cursor){
+    cursor.each(function(){
+      wsClients[req.query.copartyId].forEach(function (client) {
+        client.send('COPARTY UPDATE: '+req.query.copartyId);
+      });
+    })
   })
-})
+
+  ws.on('close', function() {
+    wsClients[req.query.copartyId].splice( wsClients[req.query.copartyId].indexOf(ws), 1 );
+    console.log("wsClients: ", wsClients);
+  });
+
+});
 
 function startExpress(connection) {
   app.use(bodyParser.json());
@@ -67,7 +110,7 @@ function startExpress(connection) {
   }));
   app.use('/api/v1', router);
   app._rdbConn = connection;
-  server.listen(config.express.port);
+  app.listen(config.express.port);
   console.log('Listening on port ' + config.express.port);
 }
 
