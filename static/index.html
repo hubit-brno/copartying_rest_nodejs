@@ -1,0 +1,42 @@
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.7/socket.io.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/reqwest/2.0.5/reqwest.min.js"></script>
+
+<ul>
+	<li>set some token</li>
+	<li>click the button</li>
+	<li>add/remove a coparty in database</li>
+	<li><b>-> number should change</b></li>
+</ul>
+
+<input id="token"> <button id="button">set socket</button>
+
+<p>
+	Coparties count: <span id="copartiesCount">-</span>
+</p>
+
+<script>
+
+	window.onload = function() {
+		document.querySelector('#button').onclick = function() {
+			var token = document.querySelector('#token').value;
+			var socket = io('http://localhost:8080', {query: 'token='+token});
+
+			socket.on('coparties_updated', updateCopartiesCount);
+			// socket.on('coparty_updated', function() {});
+		}
+
+		updateCopartiesCount();
+	};
+
+	function updateCopartiesCount() {
+		reqwest({
+			url: '/coparties',
+			type: 'json'
+		}).then(function(coparties) {
+			var count = coparties.length;
+			document.querySelector('#copartiesCount').innerText = count;
+			console.log('updated coparties count to', count);
+		});
+	}
+
+</script>
