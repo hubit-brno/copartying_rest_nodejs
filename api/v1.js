@@ -34,7 +34,7 @@ module.exports = function(app,express) {
       });
     });
 
-    router.put('/coparties/:copartyId/', function(req, res, next) {
+    router.put('/coparties/:copartyId', function(req, res, next) {
 
       r.table('coparties').get(req.params.copartyId).update(req.body.coparty).run(req.app._rdbConn, function(err, result) {
         if(err) {
