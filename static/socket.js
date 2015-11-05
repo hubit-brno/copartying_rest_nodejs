@@ -110,7 +110,7 @@ Socket.prototype.buildHandshake = function(){
     time: (new Date) + '',
     address: this.conn.remoteAddress,
     xdomain: !!this.request.headers.origin,
-    secure: !!this.request.connection.encrypted,
+    secure: !!this.request._rdbConn.encrypted,
     issued: +(new Date),
     url: this.request.url,
     query: url.parse(this.request.url, true).query || {}
@@ -432,7 +432,7 @@ Socket.prototype.error = function(err){
 /**
  * Disconnects this client.
  *
- * @param {Boolean} if `true`, closes the underlying connection
+ * @param {Boolean} if `true`, closes the underlying _rdbConn
  * @return {Socket} self
  * @api public
  */
@@ -443,7 +443,7 @@ Socket.prototype.disconnect = function(close){
     this.client.disconnect();
   } else {
     this.packet({ type: parser.DISCONNECT });
-    this.onclose('server namespace disconnect');
+    this.onclose('httpServer namespace disconnect');
   }
   return this;
 };

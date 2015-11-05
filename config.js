@@ -7,7 +7,10 @@ module.exports = {
     servers: [],
     pool: false
   },
-  express: {    
+  express: {
     port: 8080
-  }
+  },
+  api: [
+    "v1"
+  ]
 };

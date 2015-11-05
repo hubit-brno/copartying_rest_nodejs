@@ -65,7 +65,7 @@ module.exports = {
     io = socketIO(server);
     dbConn = app._rdbConn;
 
-    io.on("connection", onConnection);
+    io.on("_rdbConn", onConnection);
   }
 
 };
