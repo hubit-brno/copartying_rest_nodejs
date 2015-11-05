@@ -53,4 +53,32 @@ module.exports = function(router, r){
 
     });
   });
+
+
+  router.post('/coparties/:copartyId/items/:itemId', function(req, res, next) {
+
+    var user = req.body.user;
+    user.createdAt = r.now();
+
+    r.table('coparties').get(req.params.copartyId).update(function(row) {
+
+      var item = row("items").filter({"id": req.params.itemId.toString()})(0);
+      item = item.merge({"users": item("users").default([]).append(user)});
+
+      var otherItems = row("items").filter(function(it){
+        return it("id").ne(req.params.itemId.toString());
+      })
+      return {"items": otherItems.append(item)};
+    
+
+    }).run(req.app._rdbConn, function(err, result) {
+      if(err) {
+        return next(err);
+      }
+
+      res.json(result);
+
+    });
+  });
+
 }
