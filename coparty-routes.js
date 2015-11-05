@@ -63,13 +63,18 @@ module.exports = function(router, r){
     r.table('coparties').get(req.params.copartyId).update(function(row) {
 
       var item = row("items").filter({"id": req.params.itemId.toString()})(0);
-      item = item.merge({"users": item("users").default([]).append(user)});
+
+      var existedUser = item("users").default([{"email": user["email"], "count": 0}]).filter({"email": user["email"]})(0).default({"email": user["email"], "count": 0})
+      existedUser = existedUser.merge({"count": existedUser("count").add(parseInt(user["count"]))});
+      var otherUsers = item("users").default([{"email": user["email"]}]).filter(function(us) {
+        return us("email").ne(user["email"]);
+      });
+      item = item.merge({"users": otherUsers.append(existedUser)});
 
       var otherItems = row("items").filter(function(it){
         return it("id").ne(req.params.itemId.toString());
       })
       return {"items": otherItems.append(item)};
-    
 
     }).run(req.app._rdbConn, function(err, result) {
       if(err) {
