@@ -6,6 +6,5 @@ var express = require('express');
 var http = require("http");
 var socketHooks = require(__dirname + '/socket-hooks.js');
 var coparty = require(__dirname+"/coparty.js")(express, http, bodyParser, r, fs, socketHooks);
-
-
+//run coparty Application
 coparty.run(config);
