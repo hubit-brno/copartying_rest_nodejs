@@ -42,7 +42,7 @@ module.exports = function (express, http, bodyParser, r, fs, socketHooks) {
          */
         loadApi: function () {
             this.config.api.forEach(function (version) {
-                var path = __dirname + "/api/" + version + ".js";
+                var path = __dirname + "/api/" + version + "/" + version + ".js";
                 console.log(path);
                 fs.exists(path, function (exists) {
                     if (exists) {

@@ -12,7 +12,8 @@
     "fs-extra": "^0.26.2",
     "rethinkdb": "^2.1.1",
     "socket.io": "^1.3.7",
-    "thinky": "^2.1.11"
+    "thinky": "^2.1.11",
+    "validate.js": "^0.9.0"
   },
   "devDependencies": {
     "nodemon": "^1.8.1"

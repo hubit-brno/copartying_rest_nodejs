@@ -1,3 +1,5 @@
+var Coparty = require('./copartyModel.js');
+
 module.exports = function(app,express) {
     console.log("Loading API v1");
     //console.log(app);
@@ -9,7 +11,6 @@ module.exports = function(app,express) {
           return next(err);
         }
 
-        //Retrieve all the todos in an array.
         cursor.toArray(function(err, result) {
           if(err) {
             return next(err);
@@ -22,16 +23,22 @@ module.exports = function(app,express) {
 
     router.post('/coparties', function(req, res, next) {
 
-      var coparty = req.body.coparty;
-      coparty.createdAt = r.now();
+      var data = req.body.coparty;
+      data.createdAt = r.now();
+      var coparty = new Coparty(data);
 
-      r.table('coparties').insert(coparty, {returnChanges: true}).run(req.app._rdbConn, function(err, result) {
-        if(err) {
-          return next(err);
-        }
+      if (coparty.validateCoparty()) {
+        r.table('coparties').insert(coparty.to_json(), {returnChanges: true}).run(req.app._rdbConn, function(err, result) {
+          if(err) {
+            return next(err);
+          }
 
-        res.json(result.changes[0] ? result.changes[0].new_val : {});
-      });
+          res.json(result.changes[0] ? result.changes[0].new_val : {});
+        });
+      } else {
+        res.json({coparty: coparty.to_json(), errors: coparty.getErrors()})
+      }
+
     });
 
     router.put('/coparties/:copartyId', function(req, res, next) {
