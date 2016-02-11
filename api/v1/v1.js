@@ -5,6 +5,13 @@ module.exports = function(app,express) {
     //console.log(app);
     var router = express.Router();
     var r = app.locals.r;
+
+    router.use(function(req, res, next) {
+      res.header("Access-Control-Allow-Origin", "*");
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      next();
+    });
+
     router.get('/coparties', function(req, res, next) {
       r.table('coparties').orderBy({index: 'createdAt'}).run(req.app._rdbConn, function(err, cursor) {
         if(err) {
